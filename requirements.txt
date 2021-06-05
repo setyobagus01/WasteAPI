@@ -7,11 +7,13 @@ itsdangerous
 Jinja2
 MarkupSafe
 pytz
-six
+six==1.15.0
 SQLAlchemy
 Werkzeug==2.0.1
 requests
 tensorflow==2.4
 keras
-numpy
+numpy==1.19.2
 pillow
+gunicorn==19.6.0
+google-cloud-storage==1.38.0
