@@ -1,0 +1,17 @@
+aniso8601
+click
+Flask==2.0.1
+Flask-RESTful
+Flask-SQLAlchemy==2.5.1
+itsdangerous
+Jinja2
+MarkupSafe
+pytz
+six
+SQLAlchemy
+Werkzeug==2.0.1
+requests
+tensorflow==2.4
+keras
+numpy
+pillow
