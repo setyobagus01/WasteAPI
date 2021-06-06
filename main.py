@@ -183,4 +183,4 @@ api.add_resource(Content, "/api/content")
 api.add_resource(ContentById, "/api/content/<int:contentId>")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")

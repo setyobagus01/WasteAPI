@@ -1,5 +1,5 @@
 /d-garbage-classification.db.sql
-env/*
 prediction/model_inceptionv3.h5
+env/*
 app.yaml
 DockerFile
