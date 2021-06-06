@@ -17,3 +17,4 @@ numpy==1.19.2
 pillow
 gunicorn==19.6.0
 google-cloud-storage==1.38.0
+gevent==1.4.0

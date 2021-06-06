@@ -6,6 +6,7 @@ from flask import Flask, request, jsonify
 from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
+from gevent.pywsgi import WSGIServer
 import os
 
 from prediction.predict import model_predict
