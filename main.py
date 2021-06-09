@@ -5,9 +5,10 @@ import werkzeug
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import desc
 from werkzeug.utils import secure_filename
-from gevent.pywsgi import WSGIServer
 import os
+import operator
 
 from prediction.predict import model_predict
 
@@ -59,6 +60,8 @@ content_put_args.add_argument(
     "imageUrl", type=str, help="imageUrl of the waste is required",  required=True)
 content_put_args.add_argument(
     "content", type=str, help="content of the waste is required",  required=True)
+content_get_args = reqparse.RequestParser()
+content_get_args.add_argument("wasteType", required=False)
 
 # Waste Schema
 waste_fields = {
@@ -134,18 +137,40 @@ class Image(Resource):
         predicted_class = zip(labels, classes)
 
         for (label, p) in predicted_class:
-            result.append({label: float(p) * 100})
+            result.append({"wasteType":label, "prediction": float(p) * 100, "imageUrl": file_path})
 
-        return result, 200
+        # a_list = [
+        #     {'dep_price': '42.350', 'dep_date': '8-Mar-2017', 'trip_type': 'dep'},
+        #     {'dep_price': '42.350', 'dep_date': '9-Mar-2017', 'trip_type': 'dep'},
+        #     {'dep_price': '36.350', 'dep_date': '10-Mar-2017', 'trip_type': 'dep'}
+        # ]
+
+        # new_result = []
+
+        # for (label, p) in result:
+        #     sorted(result, key=lambda : float(p) * 100, reverse=True)
+
+        # new_result = 
+        # print('\n'.join(['%s' % x for x in a_new_list]))
+
+        return sorted(result, key = lambda i: i['prediction'], reverse=True)[0:3], 200
 
 
 class Content(Resource):
     @marshal_with(content_fields)
     def get(self):
+        args = content_get_args.parse_args()
         content = ContentModel.query.all()
+        print(args['wasteType'])
+        
+        if args['wasteType']:
+            content = ContentModel.query.filter_by(wasteType=args['wasteType']).all()
+            return content, 200
+        else:
+            return content, 200
+        
+        
 
-     
-        return content, 200
     @marshal_with(content_fields)
     def put(self):
         args = content_put_args.parse_args()
@@ -154,6 +179,18 @@ class Content(Resource):
         db.session.add(content)
         db.session.commit()
         return content, 201
+
+class ContentByType(Resource):
+    @marshal_with(content_fields)
+    def get(self):
+        args = request.args
+        print(args['wasteType'])
+        content = ContentModel.query.filter_by(wasteType=args['wasteType']).all()
+
+        return content, 200
+            
+
+
     
 
 class ContentById(Resource):
@@ -176,6 +213,8 @@ class ContentById(Resource):
         return {"message": "Content deleted..."}, 202
 
 
+
+
 api.add_resource(Waste, "/api/waste")
 api.add_resource(WasteById, "/api/waste/<int:wasteId>")
 api.add_resource(Image, "/api/predict")
@@ -184,4 +223,4 @@ api.add_resource(Content, "/api/content")
 api.add_resource(ContentById, "/api/content/<int:contentId>")
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True, port=8080, host="0.0.0.0")
